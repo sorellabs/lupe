@@ -113,11 +113,13 @@ var NodeList = Base.derive({
 
 , reduce:
   function _reduce(initial, callback) {
-    return seq.reduce(this._children, initial, call_folder(this, callback)) }
+    return arguments.length == 1?  seq.reduce(this._children, call_folder(this, initial))
+    :      /* otherwise */         seq.reduce(this._children, initial, call_folder(this, callback)) }
 
 , reduce_right:
   function _reduce_right(initial, callback) {
-    return seq.reduce_right(this._children, initial, call_folder(this, callback)) }
+    return arguments.length == 1?  seq.reduce_right(this._children, call_folder(this, initial))
+    :      /* otherwise */         seq.reduce_right(this._children, initial, call_folder(this, callback)) }
 
 , filter:
   function _filter(predicate) {
