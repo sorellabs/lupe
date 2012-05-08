@@ -293,8 +293,41 @@ describe('[] NodeList', function() {
 })
 
 
+
+describe('{} Attribute', function() {
+  describe('λ toString', function() {
+    it('Should return a representation of the attribute as a String.')
+  })
+})
+
+
+
 describe('{} Node', function() {
+  describe('λ init', function() {
+    it('Should initialise the object with the Node interface.')
+  })
 
+  describe('λ detach', function() {
+    it('Should remove the node from its parent.')
+  })
 
+  describe('λ at', function() {
+    it('Should return the value of the attribute with the given name.')
+    it('Given a default value, should return that if there\'s no such attribute.')
+  })
 
+  describe('λ put', function() {
+    it('Should set a new attribute for the given name.')
+  })
+
+  describe('λ clone', function() {
+    it('Should construct a new Node with same properties but different objects.')
+    it('Given a deep clone, should also clone all the nodes below it.')
+    it('Given a non-deep clone, should shallow-clone the children list.')
+  })
+
+  describe('λ toString', function() {
+    it('Should return a string representation of the node.')
+    it('Given children, should include the representation of all nodes below it.')
+  })
 })
