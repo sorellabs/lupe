@@ -168,7 +168,7 @@ var Node = Base.derive({
 
 , detach:
   function _detach() {
-    this.parent.remove(this)
+    this.parent.children.remove(this)
     return this }
 
 
