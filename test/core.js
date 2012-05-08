@@ -4,6 +4,8 @@ var _ = require('../src/core')
 
 describe('[] NodeList', function() {
 
+  function even(x){ return x % 2 == 0 }
+
   var n, node
   beforeEach(function() {
     n    = _.NodeList.make()
@@ -148,7 +150,146 @@ describe('[] NodeList', function() {
     })
   })
 
+  describe('λ reduce', function() {
+    it('Should apply folder to each item in the list.', function() {
+      var stub = sinon.stub().returnsArg(1)
+      n.append(1).append(2).append(3).reduce(0, stub)
+      ensure(stub).property('callCount').same(3)
+      ensure(stub).invoke('calledWithExactly', 0, 1, 0, n).ok()
+      ensure(stub).invoke('calledWithExactly', 1, 2, 1, n).ok()
+      ensure(stub).invoke('calledWithExactly', 2, 3, 2, n).ok()
+    })
+    it('Given an initial value, should use it as as the starting accumulator.', function() {
+      var stub = sinon.stub()
+      n.append(1).reduce(0, stub)
+      ensure(stub).invoke('calledWithExactly', 0, 1, 0, n).ok()
+    })
+    it('Given no initial value, should use first item in sequence as accumulator.', function() {
+      var stub = sinon.stub()
+      n.append(1).append(2).reduce(stub)
+      ensure(stub).invoke('calledWithExactly', 1, 2, 1, n).ok()
+    })
+    it('Should use the return value for the next iteration\'s accumulator.', function() {
+      var stub = sinon.stub().returnsArg(1)
+      n.append(1).append(2).reduce(0, stub)
+      ensure(stub).invoke('calledWithExactly', 0, 1, 0, n).ok()
+      ensure(stub).invoke('calledWithExactly', 1, 2, 1, n).ok()
+    })
+    it('Should return the accumulated value.', function() {
+      var stub = sinon.stub().returnsArg(1)
+      n.append(1).append(2).reduce(0, stub)
+      ensure(stub).invoke('calledWithExactly', 0, 1, 0, n).ok()
+      ensure(stub).invoke('calledWithExactly', 1, 2, 1, n).ok()
+      ensure(n.reduce(0, stub)).same(2)
+    })
+  })
 
+  describe('λ reduce', function() {
+    it('Should apply folder to each item in the list.', function() {
+      var stub = sinon.stub().returnsArg(1)
+      n.append(1).append(2).append(3).reduce_right(0, stub)
+      ensure(stub).property('callCount').same(3)
+      ensure(stub).invoke('calledWithExactly', 0, 3, 2, n).ok()
+      ensure(stub).invoke('calledWithExactly', 3, 2, 1, n).ok()
+      ensure(stub).invoke('calledWithExactly', 2, 1, 0, n).ok()
+    })
+    it('Given an initial value, should use it as as the starting accumulator.', function() {
+      var stub = sinon.stub()
+      n.append(1).reduce_right(0, stub)
+      ensure(stub).invoke('calledWithExactly', 0, 1, 0, n).ok()
+    })
+    it('Given no initial value, should use first item in sequence as accumulator.', function() {
+      var stub = sinon.stub()
+      n.append(1).append(2).reduce_right(stub)
+      ensure(stub).invoke('calledWithExactly', 2, 1, 0, n).ok()
+    })
+    it('Should use the return value for the next iteration\'s accumulator.', function() {
+      var stub = sinon.stub().returnsArg(1)
+      n.append(1).append(2).reduce_right(0, stub)
+      ensure(stub).invoke('calledWithExactly', 0, 2, 1, n).ok()
+      ensure(stub).invoke('calledWithExactly', 2, 1, 0, n).ok()
+    })
+    it('Should return the accumulated value.', function() {
+      var stub = sinon.stub().returnsArg(1)
+      n.append(1).append(2).reduce_right(0, stub)
+      ensure(stub).invoke('calledWithExactly', 0, 2, 1, n).ok()
+      ensure(stub).invoke('calledWithExactly', 2, 1, 0, n).ok()
+      ensure(n.reduce_right(0, stub)).same(1)
+    })
+  })
+
+  describe('λ every', function() {
+    it('Should apply predicate to each item in the list.', function() {
+      var stub = sinon.stub().returns(true)
+      n.append(1).append(2).append(3).every(stub)
+      ensure(stub).invoke('calledWithExactly', 1, 0, n).ok()
+      ensure(stub).invoke('calledWithExactly', 2, 1, n).ok()
+      ensure(stub).invoke('calledWithExactly', 3, 2, n).ok()
+    })
+    it('Should return `false` as soon as the predicate fails.', function() {
+      var stub = sinon.stub().returns(false)
+      ensure(n.append(1).append(2).every(stub)).not().ok()
+      ensure(stub).property('callCount').same(1)
+    })
+    it('Should return `true` if all items pass.', function() {
+      var stub = sinon.stub().returns(true)
+      ensure(n.append(1).append(2).every(stub)).ok()
+      ensure(stub).property('callCount').same(2)
+    })
+  })
+
+  describe('λ some', function() {
+    it('Should apply predicate to all items in the list.', function() {
+      var stub = sinon.stub().returns(false)
+      n.append(1).append(2).append(3).some(stub)
+      ensure(stub).invoke('calledWithExactly', 1, 0, n).ok()
+      ensure(stub).invoke('calledWithExactly', 2, 1, n).ok()
+      ensure(stub).invoke('calledWithExactly', 3, 2, n).ok()
+    })
+    it('Should return `true` as soon as the predicate holds.', function() {
+      var stub = sinon.stub().returns(true)
+      ensure(n.append(1).append(2).some(stub)).ok()
+      ensure(stub).property('callCount').same(1)
+    })
+    it('Should return `false` if all items fail.', function() {
+      var stub = sinon.stub().returns(false)
+      ensure(n.append(1).append(2).some(stub)).not().ok()
+      ensure(stub).property('callCount').same(2)
+    })
+  })
+
+  describe('λ filter', function() {
+    it('Should apply filter to each item in the list.', function() {
+      var stub = sinon.stub()
+      n.append(1).append(2).append(3).filter(stub)
+      ensure(stub).property('callCount').same(3)
+    })
+    it('Should return a new NodeList with the items that passed the predicate.', function() {
+      var x = n.append(1).append(2).append(3).filter(even)
+      ensure(x).property('_children').equals([2])
+      ensure(n).property('_children').equals([1,2,3])
+    })
+  })
+
+  describe('λ map', function() {
+    it('Should apply mapping to each item in the list.', function() {
+      var stub = sinon.stub()
+      n.append(1).append(2).append(3).map(stub)
+      ensure(stub).property('callCount').same(3)
+    })
+    it('Should return a new NodeList with all items transformed by the mapping.', function() {
+      var x = n.append(1).append(2).append(3).map(even)
+      ensure(x).property('_children').equals([false, true, false])
+      ensure(n).property('_children').equals([1, 2, 3])
+    })
+  })
+
+  describe('λ toString', function() {
+    it('Should return a representation of all childrens as one string.', function() {
+      n.append(1).append(2).append(3)
+      ensure(n.toString()).same('123')
+    })
+  })
 })
 
 
