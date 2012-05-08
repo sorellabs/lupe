@@ -123,11 +123,11 @@ var NodeList = Base.derive({
 
 , filter:
   function _filter(predicate) {
-    return Node.make(seq.filter(this._children, call_predicate(this, predicate))) }
+    return NodeList.make(seq.filter(this._children, call_predicate(this, predicate))) }
 
 , map:
   function _map(mapping) {
-    return Node.make(seq.filter(this._children, call_predicate(this, mapping))) }
+    return NodeList.make(seq.filter(this._children, call_predicate(this, mapping))) }
 
 , some:
   function _some(predicate) {
