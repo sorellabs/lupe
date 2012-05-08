@@ -174,7 +174,7 @@ var Node = Base.derive({
 
 , at:
   function _at(name, _default) {
-    return name in this.attributes?  this.attributes[name].toString()
+    return name in this.attributes?  this.attributes[name].value
     :      /* otherwise */           _default }
 
 
