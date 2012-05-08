@@ -296,38 +296,96 @@ describe('[] NodeList', function() {
 
 describe('{} Attribute', function() {
   describe('λ toString', function() {
-    it('Should return a representation of the attribute as a String.')
+    it('Should return a representation of the attribute as a String.', function() {
+      var attr = _.Attribute.make('α', 'a')
+      ensure(attr.toString()).same('α="a"')
+    })
   })
 })
 
 
 
 describe('{} Node', function() {
+  var n
+  beforeEach(function() {
+    n = _.Node.make('α')
+  })
+
   describe('λ init', function() {
-    it('Should initialise the object with the Node interface.')
+    it('Should initialise the object with the Node interface.', function() {
+      var node = _.Node.make('α')
+      ensure(node).property('name').type('String')
+      ensure(node).property('parent').exists()
+      ensure(node).property('attributes').type('Object')
+      ensure(node.children).invoke('isPrototypeOf', _.NodeList)
+    })
   })
 
   describe('λ detach', function() {
-    it('Should remove the node from its parent.')
+    it('Should remove the node from its parent.', function() {
+      var node = _.Node.make('α', n)
+      node.detach()
+      ensure(node).property('parent').same(null)
+    })
   })
 
   describe('λ at', function() {
-    it('Should return the value of the attribute with the given name.')
-    it('Given a default value, should return that if there\'s no such attribute.')
+    it('Should return the value of the attribute with the given name.', function() {
+      n.attributes['a'] = _.Attribute.make('a', 'f')
+      ensure(n).invoke('at', 'a').same('f')
+    })
+    it('Given a default value, should return that if there\'s no such attribute.', function() {
+      ensure(n).invoke('at', 'a', 'x').same('x')
+    })
   })
 
   describe('λ put', function() {
-    it('Should set a new attribute for the given name.')
+    it('Should set a new attribute for the given name.', function() {
+      n.put('a', 'f')
+      ensure(n).invoke('at', 'a').same('f')
+    })
   })
 
   describe('λ clone', function() {
-    it('Should construct a new Node with same properties but different objects.')
-    it('Given a deep clone, should also clone all the nodes below it.')
-    it('Given a non-deep clone, should shallow-clone the children list.')
+    it('Should construct a new Node with same properties but different objects.', function() {
+      n.put('a', 'b')
+      var x = n.clone()
+      ensure(x).not().same(n)
+      ensure(x.children).not().same(n.children)
+      ensure(x).invoke('at', 'a').same('b')
+    })
+    it('Given a deep clone, should also clone all the nodes below it.', function() {
+      var x = _.Node.make('β')
+      var y = _.Node.make('δ')
+      n.children.append(x)
+      x.children.append(y)
+      var z = n.clone(true)
+      ensure(n).not().same(z)
+      ensure(z.children.at(0)).not().same(x)
+      ensure(z.children.at(0).children.at(0)).not().same(y)
+    })
+    it('Given a non-deep clone, should shallow-clone the children list.', function() {
+      var x = _.Node.make('β')
+      var y = _.Node.make('δ')
+      n.children.append(x)
+      x.children.append(y)
+      var z = n.clone()
+      ensure(n).not().same(z)
+      ensure(z.children.at(0)).same(x)
+      ensure(z.children.at(0).children.at(0)).same(y)
+    })
   })
 
   describe('λ toString', function() {
-    it('Should return a string representation of the node.')
-    it('Given children, should include the representation of all nodes below it.')
+    it('Should return a string representation of the node.', function() {
+      n.put('a', 'b')
+      ensure(n.toString().replace(/\s+/g, '')).same('<αa="b"></α>')
+    })
+    it('Given children, should include the representation of all nodes below it.', function() {
+      var x = _.Node.make('β')
+      var y = _.Node.make('δ')
+      n.children.append(x).append(y)
+      ensure(n.toString().replace(/\s+/g, '')).same('<α><β></β><δ></δ></α>')
+    })
   })
 })
