@@ -137,7 +137,7 @@ var NodeList = Base.derive({
 
 , toString:
   function _toString() {
-    return this.children.join('') }
+    return this._children.join('') }
 })
 
 
